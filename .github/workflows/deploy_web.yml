@@ -28,12 +28,14 @@ jobs:
       - name: Build Flutter web (with repository subpath base href)
         env:
           REPO_NAME: ${{ github.repository }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           # Extract repo name (owner/name) -> name
           REPO_NAME=${REPO_NAME#*/}
           BASE_HREF="/${REPO_NAME}/"
           echo "Building with base href: ${BASE_HREF}"
-          flutter build web --release --base-href "${BASE_HREF}"
+          flutter build web --release             --base-href "${BASE_HREF}"             --dart-define=SUPABASE_URL="${SUPABASE_URL}"             --dart-define=SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY}"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
