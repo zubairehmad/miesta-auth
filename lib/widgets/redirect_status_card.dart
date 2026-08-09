@@ -24,9 +24,9 @@ class RedirectStatusCard extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              colorScheme.primary.withValues(alpha: 0.12),
+              colorScheme.primary.withValues(alpha: 0.16),
               colorScheme.surface,
-              colorScheme.secondary.withValues(alpha: 0.08),
+              colorScheme.secondary.withValues(alpha: 0.10),
             ],
           ),
         ),
@@ -35,34 +35,58 @@ class RedirectStatusCard extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
+                constraints: const BoxConstraints(maxWidth: 560),
                 child: Card(
                   elevation: 0,
-                  color: colorScheme.surface.withValues(alpha: 0.9),
+                  color: colorScheme.surface.withValues(alpha: 0.92),
                   surfaceTintColor: colorScheme.primary.withValues(alpha: 0.12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(28),
-                    side: BorderSide(color: colorScheme.primary.withValues(alpha: 0.08)),
+                    side: BorderSide(
+                      color: colorScheme.primary.withValues(alpha: 0.12),
+                    ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 28,
+                      vertical: 32,
+                    ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(
-                          'Miesta',
+                        RichText(
                           textAlign: TextAlign.center,
-                          style: theme.textTheme.displaySmall?.copyWith(
-                            fontFamily: 'Yellowtail',
-                            fontSize: 56,
-                            color: colorScheme.primary,
-                            height: 1,
+                          text: TextSpan(
+                            style: theme.textTheme.displaySmall?.copyWith(
+                              fontFamily: 'Yellowtail',
+                              fontSize: 56,
+                              height: 1,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: 'M',
+                                style: TextStyle(
+                                  color: colorScheme.primary,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'iesta',
+                                style: TextStyle(
+                                  color: colorScheme.onSurface.withValues(
+                                    alpha: 0.96,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 18),
                         CircleAvatar(
                           radius: 34,
-                          backgroundColor: colorScheme.primary.withValues(alpha: 0.12),
+                          backgroundColor: colorScheme.primary.withValues(
+                            alpha: 0.12,
+                          ),
                           child: Icon(
                             icon,
                             size: 34,
@@ -83,8 +107,10 @@ class RedirectStatusCard extends StatelessWidget {
                           message,
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyLarge?.copyWith(
-                            color: colorScheme.onSurface.withValues(alpha: 0.78),
-                            height: 1.5,
+                            color: colorScheme.onSurface.withValues(
+                              alpha: 0.78,
+                            ),
+                            height: 1.6,
                           ),
                         ),
                       ],
