@@ -1,30 +1,73 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:miesta_auth/main.dart';
+import 'package:miesta_auth/app.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('shows fallback when redirect path is not /verify-email', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MiestaApp(initialUri: Uri.parse('https://miesta.example/?code=abc')),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('No verification data found'), findsOneWidget);
+    expect(
+      find.text(
+        'This page only handles email verification redirects at /verify-email.',
+      ),
+      findsOneWidget,
+    );
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('shows success when code is present on /verify-email', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MiestaApp(
+        initialUri: Uri.parse(
+          'https://miesta.example/verify-email?code=1591fdf0-e9b2-4d45-afe5-da0d181c0aaf',
+        ),
+      ),
+    );
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Email verified'), findsOneWidget);
+    expect(
+      find.text(
+        'Email verified, now you may login to your account with your credentials',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('shows invalid or expired message when error is present', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MiestaApp(
+        initialUri: Uri.parse(
+          'https://miesta.example/verify-email?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired&sb=',
+        ),
+      ),
+    );
+
+    expect(find.text('Email verification failed'), findsOneWidget);
+    expect(
+      find.textContaining('Email link is invalid or has expired.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('shows fallback when no code or error exists on /verify-email', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MiestaApp(initialUri: Uri.parse('https://miesta.example/verify-email')),
+    );
+
+    expect(find.text('No verification data found'), findsOneWidget);
+    expect(
+      find.text('No verification data was found in this redirect.'),
+      findsOneWidget,
+    );
   });
 }
