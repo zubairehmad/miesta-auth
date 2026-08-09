@@ -1,47 +1,28 @@
 # miesta_auth
 
-A flutter web app which handles auth related redirects from miesta.
-It helps user to:
+A Flutter web app that handles Miesta email verification redirects.
 
-- Verify their email (redirected to this page once email is verified)
-- Reset their password
+## Redirect behavior
 
-## Supabase verification setup
+This app listens for redirects on:
 
-The app now validates redirect links against Supabase and classifies them as:
+- `/verify-email`
 
-- verified
-- expired
-- invalid
-- fallback (no usable params)
+Status rules:
 
-Provide Supabase credentials at build/run time:
+- If `code` exists in redirect params -> shows **Email verified**
+- If `error`/`error_code`/`error_description` exists -> shows **Email link is invalid or expired**
+- Otherwise -> shows fallback
 
-```bash
-flutter run -d chrome \
-  --dart-define=SUPABASE_URL=YOUR_SUPABASE_URL \
-  --dart-define=SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
-```
+The app reads parameters from both query string and URL fragment.
 
-For production web builds, pass the same `--dart-define` values to `flutter build web`.
-
-## GitHub Pages deployment (CI)
-
-A workflow has been added to build the Flutter web app and publish to the `gh-pages` branch. The workflow will set the correct base href to the repository subpath automatically, so the site works when served at https://zubairehmad.github.io/miesta-auth.
-
-How it works:
-
-- The workflow triggers on pushes to `main`/`master` and can be invoked manually.
-- It runs `flutter build web --base-href "/miesta-auth/"`
-- The built files in `build/web` are published to the `gh-pages` branch using the repository's `GITHUB_TOKEN`.
-
-No extra secrets are required. After the workflow runs once, confirm GitHub Pages is set to serve the `gh-pages` branch (or use the repository pages default settings).
-
-To trigger a manual build from your local environment instead of the workflow:
+## Local run
 
 ```bash
-# Build with the correct base href for production hosting at https://zubairehmad.github.io/miesta-auth/
-flutter build web --release --base-href "/miesta-auth/" \
-  --dart-define=SUPABASE_URL=YOUR_SUPABASE_URL \
-  --dart-define=SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+flutter run -d chrome
 ```
+
+Then test with URLs like:
+
+- `http://localhost:40335/verify-email?code=abc`
+- `http://localhost:40335/verify-email?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired`

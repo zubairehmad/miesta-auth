@@ -1,58 +1,34 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:miesta_auth/app.dart';
-import 'package:miesta_auth/models/redirect_verification_result.dart';
-import 'package:miesta_auth/services/auth_redirect_verifier.dart';
-
-class _FakeAuthRedirectVerifier implements AuthRedirectVerifier {
-  _FakeAuthRedirectVerifier(this.result);
-
-  final RedirectVerificationResult result;
-
-  @override
-  Future<RedirectVerificationResult> verify(Uri uri) async => result;
-}
 
 void main() {
-  testWidgets('shows the fallback page when no redirect parameters are present', (
+  testWidgets('shows fallback when redirect path is not /verify-email', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MiestaApp(
-        initialUri: Uri.parse('https://miesta.example/'),
-        redirectVerifier: _FakeAuthRedirectVerifier(
-          const RedirectVerificationResult.fallback(
-            message:
-                'Open the link sent by Miesta to continue the verification process.',
-          ),
-        ),
-      ),
+      MiestaApp(initialUri: Uri.parse('https://miesta.example/?code=abc')),
     );
-    await tester.pumpAndSettle();
 
     expect(find.text('No verification data found'), findsOneWidget);
     expect(
       find.text(
-        'Open the link sent by Miesta to continue the verification process.',
+        'This page only handles email verification redirects at /verify-email.',
       ),
       findsOneWidget,
     );
   });
 
-  testWidgets('shows the verification success message for email redirects', (
+  testWidgets('shows success when code is present on /verify-email', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
       MiestaApp(
         initialUri: Uri.parse(
-          'https://miesta.example/auth/callback?type=email_confirmation',
-        ),
-        redirectVerifier: _FakeAuthRedirectVerifier(
-          const RedirectVerificationResult.verified(),
+          'https://miesta.example/verify-email?code=1591fdf0-e9b2-4d45-afe5-da0d181c0aaf',
         ),
       ),
     );
-    await tester.pumpAndSettle();
 
     expect(find.text('Email verified'), findsOneWidget);
     expect(
@@ -63,48 +39,34 @@ void main() {
     );
   });
 
-  testWidgets('shows expired state for expired verification links', (
+  testWidgets('shows invalid or expired message when error is present', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
       MiestaApp(
         initialUri: Uri.parse(
-          'https://miesta.example/auth/callback?token_hash=abc&type=email',
-        ),
-        redirectVerifier: _FakeAuthRedirectVerifier(
-          const RedirectVerificationResult.expired(
-            message: 'This verification link has expired.',
-          ),
+          'https://miesta.example/verify-email?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired&sb=',
         ),
       ),
     );
-    await tester.pumpAndSettle();
 
-    expect(find.text('Verification link expired'), findsOneWidget);
-    expect(find.text('This verification link has expired.'), findsOneWidget);
+    expect(find.text('Email verification failed'), findsOneWidget);
+    expect(
+      find.textContaining('Email link is invalid or has expired.'),
+      findsOneWidget,
+    );
   });
 
-  testWidgets('shows invalid state for invalid verification links', (
+  testWidgets('shows fallback when no code or error exists on /verify-email', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
-      MiestaApp(
-        initialUri: Uri.parse(
-          'https://miesta.example/auth/callback?token_hash=abc&type=email',
-        ),
-        redirectVerifier: _FakeAuthRedirectVerifier(
-          const RedirectVerificationResult.invalid(
-            message:
-                'Unsupported verification link type in redirect parameters.',
-          ),
-        ),
-      ),
+      MiestaApp(initialUri: Uri.parse('https://miesta.example/verify-email')),
     );
-    await tester.pumpAndSettle();
 
-    expect(find.text('Invalid verification link'), findsOneWidget);
+    expect(find.text('No verification data found'), findsOneWidget);
     expect(
-      find.text('Unsupported verification link type in redirect parameters.'),
+      find.text('No verification data was found in this redirect.'),
       findsOneWidget,
     );
   });

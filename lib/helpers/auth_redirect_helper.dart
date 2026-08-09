@@ -15,7 +15,7 @@ Map<String, String> collectRedirectParameters(Uri uri) {
   return parameters;
 }
 
-String? extractSupabaseErrorMessage(Map<String, String> parameters) {
+String? extractRedirectErrorMessage(Map<String, String> parameters) {
   final rawError =
       parameters['error_description'] ??
       parameters['error'] ??
@@ -27,33 +27,23 @@ String? extractSupabaseErrorMessage(Map<String, String> parameters) {
   return Uri.decodeComponent(rawError.replaceAll('+', ' ')).trim();
 }
 
-bool isLikelyExpiredError(String message) {
-  final normalized = message.toLowerCase();
-  return normalized.contains('expired') ||
-      normalized.contains('otp_expired') ||
-      normalized.contains('token has expired') ||
-      normalized.contains('invalid grant') ||
-      normalized.contains('invalid_grant');
-}
+bool isVerifyEmailPath(String path) {
+  var normalized = path.trim();
+  if (normalized.isEmpty) {
+    return false;
+  }
 
-bool isEmailVerificationRedirect(Map<String, String> parameters) {
-  final combined = parameters.entries
-      .map((entry) => '${entry.key}=${entry.value}')
-      .join('&')
-      .toLowerCase();
+  while (normalized.length > 1 && normalized.endsWith('/')) {
+    normalized = normalized.substring(0, normalized.length - 1);
+  }
 
-  return combined.contains('email') &&
-      (combined.contains('confirm') ||
-          combined.contains('verification') ||
-          combined.contains('verify') ||
-          combined.contains('signup') ||
-          combined.contains('invite'));
+  return normalized == '/verify-email' || normalized.endsWith('/verify-email');
 }
 
 String buildRedirectFallbackMessage(Map<String, String> parameters) {
   final parameterNames = parameters.keys.take(4).join(', ');
   if (parameterNames.isEmpty) {
-    return 'A redirect was received, but no usable parameters were found.';
+    return 'No verification data was found in this redirect.';
   }
 
   return 'A redirect was received with parameters: $parameterNames.';
