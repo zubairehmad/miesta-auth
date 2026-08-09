@@ -9,9 +9,6 @@ void main() async {
   await Supabase.initialize(
     url: supabaseUrl,
     publishableKey: supabaseAnonKey,
-    authOptions: const FlutterAuthClientOptions(
-      authFlowType: AuthFlowType.implicit,
-    ),
   );
   runApp(const MiestaApp());
 }
