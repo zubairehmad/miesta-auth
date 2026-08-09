@@ -64,14 +64,14 @@ class RedirectStatusCard extends StatelessWidget {
                             ),
                             children: [
                               TextSpan(
-                                text: 'M',
+                                text: 'Mi',
                                 style: TextStyle(
                                   color: colorScheme.primary,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                               TextSpan(
-                                text: 'iesta',
+                                text: 'esta',
                                 style: TextStyle(
                                   color: colorScheme.onSurface.withValues(
                                     alpha: 0.96,

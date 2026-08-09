@@ -35,7 +35,7 @@ class AuthRedirectScreen extends StatelessWidget {
     if (redirectError != null) {
       return RedirectStatusCard(
         title: 'Email verification failed',
-        message: 'Email link is invalid or has expired.\n\n$redirectError',
+        message: 'Email link is invalid or has expired.',
         icon: Icons.error_outline_rounded,
       );
     }
