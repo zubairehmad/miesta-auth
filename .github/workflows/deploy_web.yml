@@ -36,6 +36,7 @@ jobs:
           BASE_HREF="/${REPO_NAME}/"
           echo "Building with base href: ${BASE_HREF}"
           flutter build web --release             --base-href "${BASE_HREF}"             --dart-define=SUPABASE_URL="${SUPABASE_URL}"             --dart-define=SUPABASE_ANON_KEY="${SUPABASE_ANON_KEY}"
+          cp build/web/index.html build/web/404.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
