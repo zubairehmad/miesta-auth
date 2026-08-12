@@ -1,28 +1,20 @@
 # miesta_auth
 
-A Flutter web app that handles Miesta email verification redirects.
-
-## Redirect behavior
+A Flutter web app that handles Miesta email verification and reset password redirects.
 
 This app listens for redirects on:
 
 - `/verify-email`
-
-Status rules:
-
-- If `code` exists in redirect params -> shows **Email verified**
-- If `error`/`error_code`/`error_description` exists -> shows **Email link is invalid or expired**
-- Otherwise -> shows fallback
-
-The app reads parameters from both query string and URL fragment.
+- `/reset-password`
 
 ## Local run
 
 ```bash
-flutter run -d chrome
+flutter run -d chrome \
+  --dart-define=SUPABASE_URL="{supabase_url}" \
+  --dart-define=SUPABASE_ANON_KEY="{supabase_anon_key}" \
+  --web-port=8080
+
 ```
 
-Then test with URLs like:
-
-- `http://localhost:40335/verify-email?code=abc`
-- `http://localhost:40335/verify-email?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired`
+**Note**: This project serves as a part of my other project.

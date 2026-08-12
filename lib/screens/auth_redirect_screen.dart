@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../helpers/auth_redirect_helper.dart';
-import '../widgets/redirect_status_card.dart';
 import 'email_verification_screen.dart';
+import 'reset_password_screen.dart';
 import 'fallback_screen.dart';
 
 class AuthRedirectScreen extends StatelessWidget {
@@ -13,33 +13,23 @@ class AuthRedirectScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final uri = initialUri ?? Uri.base;
-    final parameters = collectRedirectParameters(uri);
+    final urlParams = collectRedirectParameters(uri);
+    final pathName = getLastPath(uri.path);
 
-    if (!isVerifyEmailPath(uri.path)) {
-      return const FallbackScreen(
-        message:
-            'This page only handles email verification redirects at /verify-email.',
-      );
+    switch (pathName) {
+      case EmailVerificationScreen.pathName:
+        return EmailVerificationScreen(
+          urlParams: urlParams,
+        );
+      case ResetPasswordScreen.pathName:
+        return ResetPasswordScreen(
+          urlParams: urlParams,
+        );
+      default:
+        return const FallbackScreen(
+          title: "Path Doesn't Exist",
+          message: "Oops! It seems you've arrived at the wrong destination",
+        );
     }
-
-    final hasCode = (parameters['code'] ?? '').trim().isNotEmpty;
-    final redirectError = extractRedirectErrorMessage(parameters);
-
-    if (hasCode) {
-      return const EmailVerificationScreen(
-        message:
-            'Email verified, now you may login to your account with your credentials',
-      );
-    }
-
-    if (redirectError != null) {
-      return RedirectStatusCard(
-        title: 'Email verification failed',
-        message: 'Email link is invalid or has expired.',
-        icon: Icons.error_outline_rounded,
-      );
-    }
-
-    return FallbackScreen(message: buildRedirectFallbackMessage(parameters));
   }
 }

@@ -15,36 +15,22 @@ Map<String, String> collectRedirectParameters(Uri uri) {
   return parameters;
 }
 
-String? extractRedirectErrorMessage(Map<String, String> parameters) {
+bool isThereRedirectError(Map<String, String> parameters) {
   final rawError =
       parameters['error_description'] ??
       parameters['error'] ??
       parameters['error_code'];
-  if (rawError == null || rawError.trim().isEmpty) {
-    return null;
-  }
 
-  return Uri.decodeComponent(rawError.replaceAll('+', ' ')).trim();
+  return (rawError != null && rawError.trim().isNotEmpty);
 }
 
-bool isVerifyEmailPath(String path) {
+String getLastPath(String path) {
   var normalized = path.trim();
-  if (normalized.isEmpty) {
-    return false;
+  if (normalized.isEmpty) return "";
+  int i = normalized.length - 1;
+  while (i >= 0 && normalized[i] == '/') {
+    --i;
   }
-
-  while (normalized.length > 1 && normalized.endsWith('/')) {
-    normalized = normalized.substring(0, normalized.length - 1);
-  }
-
-  return normalized == '/verify-email' || normalized.endsWith('/verify-email');
-}
-
-String buildRedirectFallbackMessage(Map<String, String> parameters) {
-  final parameterNames = parameters.keys.take(4).join(', ');
-  if (parameterNames.isEmpty) {
-    return 'No verification data was found in this redirect.';
-  }
-
-  return 'A redirect was received with parameters: $parameterNames.';
+  normalized = normalized.substring(0, i + 1);
+  return "/${normalized.split('/').last}";
 }
