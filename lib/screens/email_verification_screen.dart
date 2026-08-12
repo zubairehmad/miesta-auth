@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../helpers/auth_redirect_helper.dart';
+import '../services/auth_actions.dart';
 import '../widgets/redirect_status_card.dart';
 
-class EmailVerificationScreen extends StatelessWidget {
+class EmailVerificationScreen extends StatefulWidget {
   static const pathName = '/verify-email';
   final Map<String, String> urlParams;
 
@@ -14,9 +14,26 @@ class EmailVerificationScreen extends StatelessWidget {
   });
 
   @override
+  State<EmailVerificationScreen> createState() =>
+      _EmailVerificationScreenState();
+}
+
+class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
+  late final bool hasSession;
+
+  @override
+  void initState() {
+    super.initState();
+
+    hasSession = AuthActions.hasSession;
+    if (hasSession) {
+      AuthActions.signOut();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final isSuccess = Supabase.instance.client.auth.currentUser != null;
-    if (isThereRedirectError(urlParams) || !isSuccess) {
+    if (isThereRedirectError(widget.urlParams) || !hasSession) {
       return RedirectStatusCard(
         title: 'Email verification failed',
         message: 'The link is invalid or has expired.',
