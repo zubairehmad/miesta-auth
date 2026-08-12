@@ -10,10 +10,11 @@ This app listens for redirects on:
 ## Local run
 
 ```bash
-flutter run -d chrome
+flutter run -d chrome \
+  --dart-define=SUPABASE_URL="{supabase_url}" \
+  --dart-define=SUPABASE_ANON_KEY="{supabase_anon_key}" \
+  --web-port=8080
+
 ```
 
-Then test with URLs like:
-
-- `http://localhost:40335/verify-email?code=abc`
-- `http://localhost:40335/verify-email?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired`
+**Note**: This project serves as a part of my other project.
